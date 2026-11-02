@@ -1,0 +1,12 @@
+{
+  "summary": "Measured benchmark complete.",
+  "at": "2026-11-02T09:44:02.922Z",
+  "model": "iq3_s",
+  "durationMs": 40179,
+  "tokensIn": 24,
+  "tokensOut": 200,
+  "outputTps": 5.5,
+  "promptTps": 6,
+  "source": "engine",
+  "settings": "Greedy · thinking off · up to 200 output tokens"
+}

@@ -25,6 +25,19 @@ Strata has three parts:
   `START-HERE.bat` or `setup.sh`, is setup from a source checkout, for developers. The release paths are the
   installer and `strata launch`.
 
+## Strata Distributed fork
+
+Read [the experiment plan and measurement guide](docs/DISTRIBUTED.md) before editing the distributed branch.
+
+| Role | Owns | Evidence to hand off |
+| --- | --- | --- |
+| Architecture / research | Model identity, partition, protocol, decision to proceed | A source revision, trace of the critical path and a break-even estimate with measured inputs |
+| Metal | Streamed decode cut, masking local work, ordered combine and recovery | A captured layer fixture and local-only parity, including an unavailable worker |
+| CUDA / RPC | Windows worker, native quant kernels, resident set and bounded transport | The same fixture on RTX 4070, raw output rows, timing and free VRAM |
+| Testing / benchmark | Reproducible A/B runs, fault injection and raw evidence | Golden checks, distributions of latency and decode rate, explicit test gaps |
+
+The technical lead assigns one owner per change and integrates on a local topic branch. Keep `main` aligned with the fork, fetch original changes from `upstream`, and record each base SHA. Keep tools and proof-of-concept code out of local inference defaults. Use the installed app, its settings and its model pack only as read-only references. Place builds, generated fixtures and run outputs in a separate directory. Commit small verified steps. Publishing branches or changing GitHub resources requires explicit authorization.
+
 ## Installing Strata for a user
 
 Follow **[docs/AI_SETUP.md](docs/AI_SETUP.md)**. For a user who wants the desktop app, send them to the installer

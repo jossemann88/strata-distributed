@@ -1,0 +1,161 @@
+{
+  "schema": "strata.gguf-expert-read.v1",
+  "timestamp": "2026-11-02T15:25:01.943282+00:00",
+  "gguf": "Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00001-of-00002.gguf",
+  "gguf_bytes": 54817524224,
+  "samples": 24,
+  "seed": 4070,
+  "layout": "three independent GGUF slices per expert",
+  "concurrency": 3,
+  "cache_policy": "F_NOCACHE=1,F_RDAHEAD=0 on probe handle; no cache purge",
+  "metric": "wall time from submit to completion per expert; includes Python overhead",
+  "total_expert_bytes": 47411200,
+  "median_ms": 1.467271,
+  "p95_nearest_rank_ms": 2.812208,
+  "rows": [
+    {
+      "layer": 7,
+      "expert": 352,
+      "bytes": 2176000,
+      "elapsed_ms": 1.641625
+    },
+    {
+      "layer": 37,
+      "expert": 140,
+      "bytes": 2176000,
+      "elapsed_ms": 1.515375
+    },
+    {
+      "layer": 30,
+      "expert": 367,
+      "bytes": 1715200,
+      "elapsed_ms": 1.333334
+    },
+    {
+      "layer": 14,
+      "expert": 14,
+      "bytes": 2176000,
+      "elapsed_ms": 1.036
+    },
+    {
+      "layer": 26,
+      "expert": 121,
+      "bytes": 1971200,
+      "elapsed_ms": 0.825458
+    },
+    {
+      "layer": 18,
+      "expert": 163,
+      "bytes": 2176000,
+      "elapsed_ms": 1.095667
+    },
+    {
+      "layer": 26,
+      "expert": 159,
+      "bytes": 1971200,
+      "elapsed_ms": 1.692583
+    },
+    {
+      "layer": 17,
+      "expert": 333,
+      "bytes": 2329600,
+      "elapsed_ms": 1.781834
+    },
+    {
+      "layer": 22,
+      "expert": 371,
+      "bytes": 2176000,
+      "elapsed_ms": 1.656625
+    },
+    {
+      "layer": 16,
+      "expert": 203,
+      "bytes": 2176000,
+      "elapsed_ms": 1.547375
+    },
+    {
+      "layer": 6,
+      "expert": 278,
+      "bytes": 1971200,
+      "elapsed_ms": 1.419167
+    },
+    {
+      "layer": 20,
+      "expert": 350,
+      "bytes": 1715200,
+      "elapsed_ms": 1.569917
+    },
+    {
+      "layer": 29,
+      "expert": 290,
+      "bytes": 2329600,
+      "elapsed_ms": 1.6055
+    },
+    {
+      "layer": 34,
+      "expert": 225,
+      "bytes": 1971200,
+      "elapsed_ms": 1.34525
+    },
+    {
+      "layer": 12,
+      "expert": 206,
+      "bytes": 1715200,
+      "elapsed_ms": 0.835958
+    },
+    {
+      "layer": 44,
+      "expert": 221,
+      "bytes": 2329600,
+      "elapsed_ms": 1.570084
+    },
+    {
+      "layer": 15,
+      "expert": 189,
+      "bytes": 1971200,
+      "elapsed_ms": 1.390375
+    },
+    {
+      "layer": 8,
+      "expert": 510,
+      "bytes": 1510400,
+      "elapsed_ms": 0.750125
+    },
+    {
+      "layer": 36,
+      "expert": 30,
+      "bytes": 1510400,
+      "elapsed_ms": 0.935333
+    },
+    {
+      "layer": 23,
+      "expert": 207,
+      "bytes": 1971200,
+      "elapsed_ms": 0.715584
+    },
+    {
+      "layer": 14,
+      "expert": 57,
+      "bytes": 2176000,
+      "elapsed_ms": 1.709708
+    },
+    {
+      "layer": 10,
+      "expert": 433,
+      "bytes": 1510400,
+      "elapsed_ms": 0.816209
+    },
+    {
+      "layer": 13,
+      "expert": 87,
+      "bytes": 1510400,
+      "elapsed_ms": 2.855541
+    },
+    {
+      "layer": 33,
+      "expert": 137,
+      "bytes": 2176000,
+      "elapsed_ms": 2.812208
+    }
+  ]
+}

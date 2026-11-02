@@ -159,7 +159,7 @@ class Window {
 public:
     bool init(const strata::core::ModelGeometry& g, strata::core::SessionState& ss, const std::string& shard1, int max_t,
               int64_t max_cells, std::string& err);
-    bool run(int T, const int32_t* tokens, int64_t pos0, bool head, int32_t* out, std::string& err);
+    bool run(int T, const int32_t* tokens, int64_t pos0, bool head, int32_t* out, std::string& err, bool decode = false);
     bool commit(int n_keep, std::string& err);
     bool finish(int Tn, const int32_t* tokens, int64_t pos0, bool head, int32_t* out, double t0);
     bool copy_logits(int t, float* host) const;
@@ -361,12 +361,14 @@ private:
     std::vector<std::pair<int, int>>* rec_ = nullptr;
     // ---- SSD streaming (stream.h): the dense weights in W_, the routed experts in the arena
     std::unique_ptr<ExpertStream> st_;
+    struct LayerWaitProfile { ExpertStream::LayerWait bins[MAXT + 1][48]; };
+    std::unique_ptr<LayerWaitProfile> layer_wait_;
     bool stream_ = false, st_pred_ = false;
     std::vector<int>* cuts_ = nullptr;
     mtl::Buffer predL_, predL2_;     // 48 x MAXT x 512: layer l + 1's (l + 2's) router logits from layer l's FFN input
     int seg_T_ = 0;
     bool stream_arena(std::string& err);
-    double run_ds(Cached& c);
+    double run_ds(Cached& c, bool decode);
     // prompts on the matrix units (prompt_chunk below)
     struct PromptGemm;
     PromptGemm* pg_ = nullptr;
@@ -383,6 +385,16 @@ public:
     void stream_report(FILE* f) const {
         if (!st_) return;
         st_->report(f);
+        if (layer_wait_) {
+            for (int t = 1; t <= MAXT; ++t) {
+                for (int l = 0; l < 48; ++l) {
+                    const auto& b = layer_wait_->bins[t][l];
+                    if (b.windows)
+                        std::fprintf(f, "strata metal layer_wait: T=%d layer=%d windows=%llu waited=%llu wait_ms=%.6f\n",
+                                     t, l, (unsigned long long) b.windows, (unsigned long long) b.waited, b.wait_ms);
+                }
+            }
+        }
         for (int t = 1; t <= MAXT; ++t)
             if (win_n_[t])
                 std::fprintf(f, "stream windows T=%d     %d (%s): %.2f ms each (GPU incl. the host's turns %.2f ms)\n", t, win_n_[t],
@@ -390,9 +402,10 @@ public:
     }
     int win_n_[MAXT + 1] = {};
     double win_ms_[MAXT + 1] = {}, win_gpu_[MAXT + 1] = {};
-    void at_cut(int s) {
+    void at_cut(int s, ExpertStream::LayerWait* wait = nullptr) {
         st_->at_layer(s, seg_T_, TOPK, cut_ids_ ? cut_ids_ : ids_.as<int32_t>(), st_pred_ && !cut_ids_ ? predL_.as<float>() + (size_t) s * MAXT * 512 : nullptr,
-                      predL2_.ptr && !cut_ids_ ? predL2_.as<float>() + (size_t) s * MAXT * 512 : nullptr);
+                      predL2_.ptr && !cut_ids_ ? predL2_.as<float>() + (size_t) s * MAXT * 512 : nullptr,
+                      wait);
     }
 private:
     std::vector<float> ple_hist_;    // NG_HIST x hc_dim normalized rows, row-fastest
@@ -545,6 +558,8 @@ bool Window::init(const strata::core::ModelGeometry& g, strata::core::SessionSta
         // the model does not fit: the dense weights are read into memory below, the experts stream from the SSD
         st_ = std::make_unique<ExpertStream>();
         if (!st_->open(f_, err)) return false;
+        const char* profile = std::getenv("STRATA_METAL_LAYER_WAIT");
+        if (profile && std::strcmp(profile, "1") == 0) layer_wait_ = std::make_unique<LayerWaitProfile>();
     } else {
         {   // read ahead the weights, not the n-gram table: in a Gyro file it is 28.8 GB in the middle of the one file, read by the host from
             // the SSD a few rows at a time (src/ngram/ple_reader.cpp), and must not fill the page cache
@@ -1208,7 +1223,7 @@ void Window::ple_cpu(int Tn) {
     }
 }
 
-bool Window::run(int Tn, const int32_t* tokens, int64_t pos0, bool head, int32_t* out, std::string& err) {
+bool Window::run(int Tn, const int32_t* tokens, int64_t pos0, bool head, int32_t* out, std::string& err, bool decode) {
     mtp_src_ = nullptr;
     if (Tn < 1 || Tn > MAXT || (head && Tn > max_t_)) { err = "metal window: window size out of range"; return false; }
     if (pos0 + Tn + 1 >= max_cells_) { err = "metal window: the window runs past the context"; return false; }
@@ -1265,7 +1280,7 @@ bool Window::run(int Tn, const int32_t* tokens, int64_t pos0, bool head, int32_t
         }
         seg_T_ = Tn;
         const double r0 = now_ms();
-        last_gpu_ms_ = 1000.0 * run_ds(c);
+        last_gpu_ms_ = 1000.0 * run_ds(c, decode);
         {
             static const int kt = std::getenv("STRATA_METAL_KPROF") ? std::atoi(std::getenv("STRATA_METAL_KPROF")) : 0;
             static int seen = 0;
@@ -1350,7 +1365,7 @@ bool Window::run(int Tn, const int32_t* tokens, int64_t pos0, bool head, int32_t
     cuts_ = nullptr;
     seg_T_ = Tn;
     const double r0 = now_ms();
-    last_gpu_ms_ = 1000.0 * run_ds(cw);
+    last_gpu_ms_ = 1000.0 * run_ds(cw, decode);
     tp_rg_ = now_ms() - r0;
     last_n_disp_ = (int) ds.size();
     return rows_ ? finish_rows(Tn, tokens, out, t0) : finish(Tn, tokens, pos0, head, out, t0);
@@ -1405,8 +1420,14 @@ bool Window::finish_rows(int Tn, const int32_t* tokens, int32_t* out, double t0)
     return true;
 }
 
-double Window::run_ds(Cached& c) {
+double Window::run_ds(Cached& c, bool decode) {
     if (!stream_) return cx_->run_graph(c.ds);
+    if (decode && layer_wait_) {
+        return cx_->run_graph_seg(c.ds, c.cuts, [](void* u, int s) {
+            auto* w = static_cast<Window*>(u);
+            w->at_cut(s, &w->layer_wait_->bins[w->seg_T_][s]);
+        }, this);
+    }
     return cx_->run_graph_seg(c.ds, c.cuts, [](void* u, int s) { ((Window*) u)->at_cut(s); }, this);
 }
 
@@ -2960,7 +2981,7 @@ bool window_run(void* w, int T, const int32_t* tokens, int64_t pos0, bool head, 
     // STRATA_LOGPOS (the quant yardstick, the KL harness): every window's head logits are read, also the prompt's
     // windows that sample nothing (head_sampling off)
     static const bool logpos = std::getenv("STRATA_LOGPOS") != nullptr;
-    return ((Window*) w)->run(T, tokens, pos0, head || logpos, out, err);
+    return ((Window*) w)->run(T, tokens, pos0, head || logpos, out, err, head);
 }
 void window_reset(const strata::core::SessionState* ss) {
     if (g_the_window == nullptr || !g_the_window->ready()) return;

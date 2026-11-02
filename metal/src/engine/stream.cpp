@@ -614,7 +614,8 @@ void ExpertStream::ahead(int ln, int T, const float* pred, int K) {
     if (any) cv_.notify_all();
 }
 
-void ExpertStream::at_layer(int l, int T, int topk, const int32_t* ids, const float* pred, const float* pred2) {
+void ExpertStream::at_layer(int l, int T, int topk, const int32_t* ids, const float* pred, const float* pred2,
+                            LayerWait* decode_wait) {
     const double t0 = now_ms();
     const bool prompt = T > 8;   // a prompt chunk (the GEMM path): nearly every expert of the layer is used
     if (l == 0) { if (prompt) ++p_chunks_; else ++windows_; }
@@ -634,6 +635,7 @@ void ExpertStream::at_layer(int l, int T, int topk, const int32_t* ids, const fl
         host_ms_ += now_ms() - t0;
         return;
     }
+    if (decode_wait) ++decode_wait->windows;   // includes fully resident layers with zero wait
     std::vector<int> wait;
     {
         std::lock_guard<std::mutex> g(mu_);
@@ -685,7 +687,12 @@ void ExpertStream::at_layer(int l, int T, int topk, const int32_t* ids, const fl
             for (int s : wait) if (slots_[(size_t) s].state.load() != 0) return false;
             return true;
         });
-        (prompt ? p_wait_ms_ : wait_ms_) += now_ms() - tw;
+        const double elapsed_ms = now_ms() - tw;
+        (prompt ? p_wait_ms_ : wait_ms_) += elapsed_ms;
+        if (decode_wait) {
+            ++decode_wait->waited;
+            decode_wait->wait_ms += elapsed_ms;
+        }
     }
     if (prompt) {
         // a chunk uses nearly all of the next layer's experts: every one not in the arena is streamed in behind this

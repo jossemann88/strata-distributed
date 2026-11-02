@@ -1,0 +1,11 @@
+Source c62d5e3a15b40ea51c96aae9e8d36928965f53ab, macOS 27.0, Apple M4 Pro, 24 GB.
+CMake Release, AppleClang 21.0.0, macOS 26.5 SDK. Only target expert_parity was built.
+
+expert_parity --bench --gu IQ3_S --dn IQ4_NL --ntok 1 --layers 1 --reps 32
+device Apple M4 Pro; gate/up IQ3_S, down IQ4_NL, blob 2329600 bytes; 1 token(s)
+arena: 1 layers x 512 experts = 1.19 GB (max buffer 14.3 GB)
+ntok 1 groups  10.0 | gu 32,2,4   175.5 us   80.2 GB/s | dn  4,2,4    64.6 us  142.8 GB/s | plan   7.7 us | layer   252.9 us =   92.1 GB/s (15.7% of 585)
+
+expert_parity --gguf Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00001-of-00002.gguf --layer 7 --ntok 1 --seed 4070
+device Apple M4 Pro; gate/up IQ3_XXS, down IQ4_NL, blob 2176000 bytes; 1 token(s)
+parity IQ3_XXS/IQ4_NL ntok 1 gu 32,2,4 dn 8,2,4: plan ok (10 groups), h rel L2 1.43e-07 max 1.25e-07, y rel L2 1.03e-07 max 1.38e-07  PASS
