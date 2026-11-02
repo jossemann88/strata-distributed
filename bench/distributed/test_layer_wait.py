@@ -16,6 +16,12 @@ class LayerWaitTest(unittest.TestCase):
         self.assertEqual(report['mean_rtt_ms'], 7)
         self.assertAlmostEqual(report['total_wait_ms_per_window'], sum(range(48)) / 10)
 
+    def test_two_rows_do_not_reuse_single_row_rtt(self):
+        rows = [line.replace('T=1', 'T=2') for line in self.rows]
+        report = summarize(rows, self.wifi, 2)
+        self.assertEqual(report['payload_bytes_each_way'], 20480)
+        self.assertIsNone(report['mean_rtt_ms'])
+
     def test_rejects_incomplete_or_concatenated_logs(self):
         for lines in [self.rows[1:], self.rows * 2]:
             with self.assertRaises(ValueError):

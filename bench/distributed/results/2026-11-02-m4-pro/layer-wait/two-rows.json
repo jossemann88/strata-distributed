@@ -1,0 +1,201 @@
+{
+  "window_rows": 2,
+  "payload_bytes_each_way": 20480,
+  "windows": 63,
+  "mean_rtt_ms": null,
+  "total_wait_ms_per_window": 151.80220587301588,
+  "layers": [
+    {
+      "layer": 0,
+      "mean_wait_ms": 6.499759206349206
+    },
+    {
+      "layer": 2,
+      "mean_wait_ms": 5.508386857142857
+    },
+    {
+      "layer": 7,
+      "mean_wait_ms": 4.619203126984127
+    },
+    {
+      "layer": 38,
+      "mean_wait_ms": 4.614984777777777
+    },
+    {
+      "layer": 6,
+      "mean_wait_ms": 4.56101126984127
+    },
+    {
+      "layer": 14,
+      "mean_wait_ms": 4.542247968253968
+    },
+    {
+      "layer": 46,
+      "mean_wait_ms": 4.463654793650794
+    },
+    {
+      "layer": 18,
+      "mean_wait_ms": 4.456087904761905
+    },
+    {
+      "layer": 42,
+      "mean_wait_ms": 4.4372579523809526
+    },
+    {
+      "layer": 37,
+      "mean_wait_ms": 4.3708823174603175
+    },
+    {
+      "layer": 24,
+      "mean_wait_ms": 4.213670619047619
+    },
+    {
+      "layer": 34,
+      "mean_wait_ms": 4.17958734920635
+    },
+    {
+      "layer": 22,
+      "mean_wait_ms": 4.165032396825397
+    },
+    {
+      "layer": 33,
+      "mean_wait_ms": 4.0326388571428575
+    },
+    {
+      "layer": 31,
+      "mean_wait_ms": 3.9971375555555557
+    },
+    {
+      "layer": 5,
+      "mean_wait_ms": 3.977148126984127
+    },
+    {
+      "layer": 9,
+      "mean_wait_ms": 3.9049200317460317
+    },
+    {
+      "layer": 32,
+      "mean_wait_ms": 3.8562042698412697
+    },
+    {
+      "layer": 16,
+      "mean_wait_ms": 3.841456396825397
+    },
+    {
+      "layer": 4,
+      "mean_wait_ms": 3.8053901587301584
+    },
+    {
+      "layer": 11,
+      "mean_wait_ms": 3.7416375396825394
+    },
+    {
+      "layer": 39,
+      "mean_wait_ms": 3.7012446666666667
+    },
+    {
+      "layer": 26,
+      "mean_wait_ms": 3.614910111111111
+    },
+    {
+      "layer": 43,
+      "mean_wait_ms": 3.609612476190476
+    },
+    {
+      "layer": 23,
+      "mean_wait_ms": 3.5452691746031744
+    },
+    {
+      "layer": 41,
+      "mean_wait_ms": 3.530002
+    },
+    {
+      "layer": 21,
+      "mean_wait_ms": 3.4016527142857145
+    },
+    {
+      "layer": 19,
+      "mean_wait_ms": 3.3343135714285714
+    },
+    {
+      "layer": 3,
+      "mean_wait_ms": 3.165501285714286
+    },
+    {
+      "layer": 15,
+      "mean_wait_ms": 2.5173572063492062
+    },
+    {
+      "layer": 47,
+      "mean_wait_ms": 2.1987095555555554
+    },
+    {
+      "layer": 28,
+      "mean_wait_ms": 2.189865777777778
+    },
+    {
+      "layer": 1,
+      "mean_wait_ms": 2.18373680952381
+    },
+    {
+      "layer": 44,
+      "mean_wait_ms": 1.9208313333333333
+    },
+    {
+      "layer": 17,
+      "mean_wait_ms": 1.91495573015873
+    },
+    {
+      "layer": 45,
+      "mean_wait_ms": 1.7962248888888888
+    },
+    {
+      "layer": 29,
+      "mean_wait_ms": 1.7815159047619047
+    },
+    {
+      "layer": 25,
+      "mean_wait_ms": 1.7432552698412698
+    },
+    {
+      "layer": 35,
+      "mean_wait_ms": 1.610941888888889
+    },
+    {
+      "layer": 12,
+      "mean_wait_ms": 1.5684517301587302
+    },
+    {
+      "layer": 20,
+      "mean_wait_ms": 1.497990126984127
+    },
+    {
+      "layer": 10,
+      "mean_wait_ms": 1.454785619047619
+    },
+    {
+      "layer": 8,
+      "mean_wait_ms": 1.3545945873015874
+    },
+    {
+      "layer": 30,
+      "mean_wait_ms": 1.3260217936507936
+    },
+    {
+      "layer": 27,
+      "mean_wait_ms": 1.3246932222222223
+    },
+    {
+      "layer": 13,
+      "mean_wait_ms": 1.3019331904761904
+    },
+    {
+      "layer": 40,
+      "mean_wait_ms": 1.2730225555555557
+    },
+    {
+      "layer": 36,
+      "mean_wait_ms": 1.1525132063492065
+    }
+  ]
+}

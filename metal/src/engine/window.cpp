@@ -385,6 +385,13 @@ public:
     void stream_report(FILE* f) const {
         if (!st_) return;
         st_->report(f);
+        report_layer_wait(f);
+        for (int t = 1; t <= MAXT; ++t)
+            if (win_n_[t])
+                std::fprintf(f, "stream windows T=%d     %d (%s): %.2f ms each (GPU incl. the host's turns %.2f ms)\n", t, win_n_[t],
+                             t == 8 ? "prompt rows" : "decode", win_ms_[t] / win_n_[t], win_gpu_[t] / win_n_[t]);
+    }
+    void report_layer_wait(FILE* f) const {
         if (layer_wait_) {
             for (int t = 1; t <= MAXT; ++t) {
                 for (int l = 0; l < 48; ++l) {
@@ -395,10 +402,6 @@ public:
                 }
             }
         }
-        for (int t = 1; t <= MAXT; ++t)
-            if (win_n_[t])
-                std::fprintf(f, "stream windows T=%d     %d (%s): %.2f ms each (GPU incl. the host's turns %.2f ms)\n", t, win_n_[t],
-                             t == 8 ? "prompt rows" : "decode", win_ms_[t] / win_n_[t], win_gpu_[t] / win_n_[t]);
     }
     int win_n_[MAXT + 1] = {};
     double win_ms_[MAXT + 1] = {}, win_gpu_[MAXT + 1] = {};
@@ -1452,6 +1455,11 @@ void stream_atexit() {
     if (g_stream_window) g_stream_window->stream_report(stderr);
 }
 }  // namespace
+
+// The serving process uses _Exit on macOS, bypassing the normal stream report.
+void report_layer_wait_on_exit() {
+    if (g_stream_window) g_stream_window->report_layer_wait(stderr);
+}
 
 // The arena, once the rest is allocated (the MTP layer loads after init): what the GPU working set and the RAM leave
 // with STRATA_METAL_KEEP_FREE_GB kept for macOS (default: 7 GB, or 15% of the RAM when that is more - the M5 Max

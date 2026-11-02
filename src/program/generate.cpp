@@ -137,6 +137,7 @@
 #include <cuda_runtime.h>
 #if defined(STRATA_GPU_METAL)
 namespace strata::metal_engine {
+void report_layer_wait_on_exit();
 void set_model_shard(const char* shard1);   // metal/src/engine/window.cpp
 void set_batch_slots(int n);   // metal/src/engine/window.cpp: how many --batch slots the window keeps state for
 // batch slot b <-> the main sequence: the running state (unless kv_only) and the first `upto` cells of K/V
@@ -17659,6 +17660,7 @@ int main(int argc, char** argv) {
 #if defined(STRATA_GPU_METAL)
         // the stdin reader (detached above) may still take in_mu when the server closes the pipe after QUIT; on macOS
         // locking that mutex once this scope has destroyed it throws (the engine ended with an abort): end here
+        strata::metal_engine::report_layer_wait_on_exit();
         std::fflush(stdout);
         std::fflush(stderr);
         std::_Exit(0);

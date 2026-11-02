@@ -1,0 +1,8 @@
+strata metal stream: expert arena 3.78 GB, 1728 slots in 3 size classes, 0 experts read from the profile's top (24576 ranked) in 0.0 s (0.00 GB/s); 6 I/O threads, read-ahead top 6; 1 buffers
+expert stream            64 windows: 55089 distinct lookups (860.8 per window), hits 0.5612, read-ahead hits 0.1650 (2516 of them late), misses 0.2738 (235.7 per window); read-aheads 13895 (217.1 per window, 594 dropped); 906.3 MB read per window (28385 reads); host 151.39 ms per window, of it waiting 150.45 ms
+stream windows T=1     1 (decode): 1151.82 ms each (GPU incl. the host's turns 656.17 ms)
+stream windows T=2     63 (decode): 303.77 ms each (GPU incl. the host's turns 302.36 ms)
+speculation              64 rounds of 2, drafts accepted 0 of 63 (0.000), 1.00 tokens per round
+prompt  : 9707
+output  : 16451 18 19025 43 220 95726 101832 142304 103715 40186 43 3191 7869 2657 220 100900 3709 96395 99474 96581 220 18 15 15 44 3709 99486 111423 97273 99142 98140 9616 98644 220 16 17 23 15 17044 16 17 23 15 46662 96580 95824 108896 220 17 35 220 97795 102112 9616 37586 1679 12 17 35 7313 97318 98818 109910 1710
+decode                   64 tokens in 20291.6 ms  ->  3.15 tok/s

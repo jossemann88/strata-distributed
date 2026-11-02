@@ -68,7 +68,7 @@ Build the full Metal target `strata` in a separate build directory using the ups
 For an isolated diagnostic on the IQ3_S pack, set `BUILD_DIR`, `PACK`, `GGUF`, `PLE_GGUF` and `EXPERT_PROFILE` to the build directory, pack, first shard, second shard and installed ranking file. Run it after the regular engine releases memory. Use a fresh scratch directory for output. Compare the printed arena size with the production arena because available memory affects it.
 
 ```sh
-STRATA_METAL_LAYER_WAIT=1 STRATA_METAL_STREAM=1 "$BUILD_DIR/strata" generate \
+STRATA_METAL_LAYER_WAIT=1 STRATA_METAL_ARENA_GB=3.78 STRATA_METAL_STREAM=1 "$BUILD_DIR/strata" \
   --pack "$PACK" --native "$GGUF" --ple-gguf "$PLE_GGUF" \
   --expert-profile "$EXPERT_PROFILE" --expert-cache 64 --mmap-experts \
   --prefill auto --spec 2 --suffix-draft 0 --max-context 65536 --vram-reserve-mib 2048 \
@@ -82,3 +82,12 @@ python3 bench/distributed/layer_wait.py /path/to/engine.log bench/distributed/re
 ```
 
 The report places average wait per layer beside the measured average RTT (7.71 ms for the one-row response in run 1). Both include occasional stalls. This is a screen for a serial one-request-per-layer design. Evaluate overlap, RTX compute, staging and reduction separately. A whole layer of routed experts in this pack takes 0.72–1.27 GiB depending on its tensor types, before CUDA work buffers. A partial resident set can save only the wait attributable to its selected experts.
+
+For the app's inference path, use the same flags and replace `--tokens 9707 --max-new 64` with `--serve`. Pipe the two lines below to the engine's standard input. This local process does not open an HTTP port. Keep `--spec 2` for this native IQ pack. The server can use one row internally when it has no draft, whereas the standalone generator can evaluate two. Use the window size actually reported. The analyzer accepts `--window-rows N` and leaves the RTT empty when the corresponding N-row payload has not been measured.
+
+```text
+GEN 64 9707
+QUIT
+```
+
+**First app-path measurement, 2 November 2026.** On the M4 Pro, 64 generated tokens took 13.395 s with profiling (4.78 tokens/s) and 13.029 s without (4.91 tokens/s). All token IDs matched. This single pair used the fixed input ID 9707, a fresh process per run, a 3.78 GB arena and one row per window. Across 48 layers the profiled run spent 91.33 ms per window in host waits for expert reads, around 44% of its decode time. The highest mean waits were layer 0 (5.04 ms), layer 18 (3.21 ms) and layer 2 (3.17 ms). Even the highest was below the 7.71 ms mean application RTT already measured for a single pooled FP32 return row. For this workload, avoiding SSD waits alone does not pay for a synchronous Wi-Fi request per selected layer. Actual RTX compute, transfer overlap and other prompts remain untested. A block of consecutive full layers could amortize a round trip, but would also move attention and state and needs a separate design. [Layer rankings](../bench/distributed/results/2026-11-02-m4-pro/layer-wait/serve-one-row.json) · [Token parity and timings](../bench/distributed/results/2026-11-02-m4-pro/layer-wait/serve-parity.txt)
