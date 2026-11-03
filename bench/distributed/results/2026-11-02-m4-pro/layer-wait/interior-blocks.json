@@ -1,0 +1,30 @@
+[
+  {
+    "weight_budget_GiB": 4,
+    "first": 5,
+    "last": 8,
+    "gguf_weight_bytes": 4191294080,
+    "observed_wait_ms": 9.0459375625
+  },
+  {
+    "weight_budget_GiB": 6,
+    "first": 4,
+    "last": 9,
+    "gguf_weight_bytes": 6365956992,
+    "observed_wait_ms": 13.384809921875
+  },
+  {
+    "weight_budget_GiB": 8,
+    "first": 2,
+    "last": 9,
+    "gguf_weight_bytes": 8522947840,
+    "observed_wait_ms": 18.570571640625
+  },
+  {
+    "weight_budget_GiB": 10,
+    "first": 2,
+    "last": 11,
+    "gguf_weight_bytes": 10449989248,
+    "observed_wait_ms": 22.029619812500002
+  }
+]
