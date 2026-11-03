@@ -1,0 +1,33 @@
+{
+  "method": "Observed requests after the last engine startup in the local IQ3_S log snapshot. Completed non-cancelled requests, at least 64 generated tokens. Bins use total prompt length, including reused tokens. Throughput excludes prompt processing. Aggregate rate is total output tokens / total decode seconds. Request p10 uses nearest rank. No prompt text or generated content collected. Uncontrolled, not a cross-pack comparison.",
+  "engine": "0.1.55-metal",
+  "hardware": "M4 Pro, 24 GB",
+  "arena_GB": 3.78,
+  "snapshot_date": "2026-11-03",
+  "all_selected": {
+    "requests": 67,
+    "output_tokens": 55633,
+    "decode_ms": 11650230,
+    "aggregate_tokens_per_s": 4.775,
+    "median_request_tokens_per_s": 4.809,
+    "p10_request_tokens_per_s": 4.394
+  },
+  "prompt_token_bins": {
+    "8192-32767": {
+      "requests": 30,
+      "output_tokens": 15281,
+      "decode_ms": 3182605,
+      "aggregate_tokens_per_s": 4.801,
+      "median_request_tokens_per_s": 4.807,
+      "p10_request_tokens_per_s": 4.438
+    },
+    "32768-65535": {
+      "requests": 37,
+      "output_tokens": 40352,
+      "decode_ms": 8467625,
+      "aggregate_tokens_per_s": 4.765,
+      "median_request_tokens_per_s": 4.821,
+      "p10_request_tokens_per_s": 4.385
+    }
+  }
+}

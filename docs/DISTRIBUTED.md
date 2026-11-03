@@ -99,3 +99,17 @@ Keep layers 0–1 (the PLE boundary) and layer 47 beside the head on the Mac for
 Run `python3 bench/distributed/block_budget.py "$GGUF" bench/distributed/results/2026-11-02-m4-pro/layer-wait/serve-one-row.json` to reproduce the [candidate list](../bench/distributed/results/2026-11-02-m4-pro/layer-wait/interior-blocks.json). At an 8 GiB weight budget the highest-scoring interior block is layers 2–9 (7.94 GiB of tensors, 18.57 ms observed wait per token). At 6 GiB, layers 4–9 take 5.93 GiB with 13.38 ms of wait.
 
 The existing CUDA stage handoff in `src/core/verify.cpp` carries FP32 residual, pending output and injection coefficients. At T=1 its data total is (4 × 2560 + 2560 + 4) × 4 = 51,216 bytes per boundary. This is a candidate LAN representation. Measure the corresponding shape with `python3 lan_probe.py measure --host WINDOWS_IP --sizes 0,10240,51216` after starting the responder. Use a hardware check of free VRAM and a representative context before committing to a block. The eventual comparison needs full local block time versus transfer + remote block time, including staging.
+
+## Block capture and Windows memory probes
+
+The Mac capture uses extra Metal synchronization points immediately before layers 4 and 10. The default local graph keeps its existing cuts. Build the full Metal target and run the following only when the installed model has been unloaded. Use a fresh output directory. It compares 64 greedy tokens both to the control run and to the recorded IQ3_S reference, saves both boundaries at position zero, and times the block at each position. Timing includes host scheduling and the extra synchronization. The TCP peer replays the recorded output after checking the input. It does not execute the block.
+
+```sh
+python3 bench/distributed/capture_block.py --engine "$BUILD_DIR/strata" --pack "$PACK" --shard "$GGUF" --ple-shard "$PLE_GGUF" --expert-profile "$EXPERT_PROFILE" --out "$NEW_RUN_DIR"
+```
+
+A small Metal test also exercises the synchronization points with synthetic tensors and checks the ordering and values at every boundary. Run `cmake --build "$BUILD_DIR" --target block_probe_test`, then `"$BUILD_DIR/block_probe_test" "$EMPTY_DIR"` and `python3 bench/distributed/fixture_replay.py --capture-dir "$EMPTY_DIR"`. The M4 Pro passed the synthetic hardware check and the separate-process byte comparison (51,216 bytes each way). On real GGUF weights, upstream expert_parity passed on all six layers 4–9 with 20 experts available per layer, ten routed, one synthetic input row and seed 4070. These kernel checks exclude attention, state updates and whole-block inference.
+
+On Windows, run `py -3 windows_gpu_probe.py --output windows-gpu.json` from the folder containing the script. With 64-bit Python and the NVIDIA driver this reports free VRAM after creating a CUDA context, available system RAM, and raw completed pinned-memory transfer times for 2 and 20 MiB. The Mac tests use a simulated driver for this probe. Use a new output filename on each run. Pair these results with the 51,216-byte Wi-Fi measurement before selecting a resident or RAM-backed block.
+
+The [Q4 capacity report](../bench/distributed/Q4_CAPACITY.md) covers alternative partitions and disk requirements. The [observed IQ3_S reference](../bench/distributed/results/2026-11-03-m4-pro/observed-iq3-speed.json) records aggregate rates by context size for 67 normal requests. Use controlled paired trials for any throughput claim.
