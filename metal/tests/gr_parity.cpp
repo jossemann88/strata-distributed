@@ -2,6 +2,7 @@
 // (fused_gr.hpp's formulas), and its speed.
 //
 //   gr_parity [--ntok N]             parity for N = 1, 3, 8 (or N), with and without the folded write
+//   gr_parity --materialize-boundary CAPTURE_DIR NEW_OUTPUT   replay the layer04 pending write (one real row)
 //   gr_parity --bench [--ntok N]     per-kernel GPU time, 8 weight sets rotated (no cache reuse across calls)
 #include "mtl_rt.h"
 #include "ref_quant.h"
@@ -23,9 +24,61 @@ struct Err {
     void add(double g, double r) { se += (g - r) * (g - r); sr += r * r; mx = std::max(mx, std::fabs(g - r)); mr = std::max(mr, std::fabs(r)); }
     double l2() const { return sr > 0 ? std::sqrt(se / sr) : std::sqrt(se); }
 };
+// The model's norm weights feed xn, after gr_norm has written the unnormalized
+// residual in place. Ones suffice here because only that residual is exported.
+int materialize_boundary(const std::string& dir, const char* out) {
+    mtl::Context cx;
+    auto r = cx.alloc(NIN * sizeof(float)), bo = cx.alloc(N * sizeof(float)), inj = cx.alloc(HC * sizeof(float));
+    for (auto [suffix, buffer] : {std::pair{"residual", &r}, {"bo", &bo}, {"inj", &inj}}) {
+        const std::string path = dir + "/layer04-" + suffix + ".f32";
+        FILE* f = std::fopen(path.c_str(), "rb");
+        if (!f) { std::perror(path.c_str()); return 1; }
+        const bool ok = std::fread(buffer->ptr, 1, buffer->bytes, f) == buffer->bytes &&
+                        std::fgetc(f) == EOF && !std::ferror(f);
+        std::fclose(f);
+        if (!ok) { std::fprintf(stderr, "unexpected data length in %s\n", path.c_str()); return 1; }
+    }
+    std::vector<float> before(r.as<float>(), r.as<float>() + NIN);
+    auto norm = cx.alloc(r.bytes), xn = cx.alloc(r.bytes);
+    std::fill_n(norm.as<float>(), NIN, 1.0f);
+    const int lib = cx.compile({"quant.metal", "units.metal", "gr.metal"});
+    const auto kernel = cx.pipeline(lib, "gr_norm");
+    GrArgs args{N, HC, LR, 1, 1, 1e-6f};
+    mtl::Dispatch d;
+    d.p = &kernel;
+    d.args = {mtl::Arg::B(r), mtl::Arg::B(bo), mtl::Arg::B(inj), mtl::Arg::B(norm), mtl::Arg::B(xn), mtl::Arg::V(args)};
+    d.grid[0] = HC;
+    d.tg[0] = 256;
+    cx.run_graph({d});
+    Err error;
+    for (int c = 0; c < HC; ++c) {
+        const double gate = 2.0 / (1.0 + std::exp(-double(inj.as<float>()[c]) / HC));
+        for (int k = 0; k < N; ++k) {
+            const int i = c * N + k;
+            const double expected = before[i] + bo.as<float>()[k] * gate;
+            const double actual = r.as<float>()[i];
+            const double scale = std::max(1.0, std::fabs(double(before[i])) + 2.0 * std::fabs(double(bo.as<float>()[k])));
+            if (!std::isfinite(expected) || !std::isfinite(actual) || std::fabs(actual - expected) > 1e-5 * scale) {
+                std::fprintf(stderr, "gr_norm disagrees with CPU reference at %d\n", i); return 1;
+            }
+            error.add(actual, expected);
+        }
+    }
+    FILE* f = std::fopen(out, "wbx");
+    if (!f) { std::perror(out); return 1; }
+    const bool written = std::fwrite(r.ptr, 1, r.bytes, f) == r.bytes;
+    if (std::fclose(f) != 0 || !written) { std::perror(out); std::remove(out); return 1; }
+    std::printf("%s gr_norm T=1: %zu bytes, CPU max abs %.9g, relative L2 %.9g\n",
+                cx.device_name().c_str(), r.bytes, error.mx, error.l2());
+    return 0;
+}
 }  // namespace
 
 int main(int argc, char** argv) {
+    if (argc > 1 && std::string(argv[1]) == "--materialize-boundary") {
+        if (argc != 4) { std::fprintf(stderr, "usage: gr_parity --materialize-boundary CAPTURE_DIR NEW_OUTPUT\n"); return 2; }
+        return materialize_boundary(argv[2], argv[3]);
+    }
     bool bench = false;
     std::vector<int> ntoks = {1, 3, 8};
     for (int i = 1; i < argc; ++i) {

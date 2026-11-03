@@ -113,3 +113,15 @@ A small Metal test also exercises the synchronization points with synthetic tens
 On Windows, run `py -3 windows_gpu_probe.py --output windows-gpu.json` from the folder containing the script. With 64-bit Python and the NVIDIA driver this reports free VRAM after creating a CUDA context, available system RAM, and raw completed pinned-memory transfer times for 2 and 20 MiB. The Mac tests use a simulated driver for this probe. Use a new output filename on each run. Pair these results with the 51,216-byte Wi-Fi measurement before selecting a resident or RAM-backed block.
 
 The [Q4 capacity report](../bench/distributed/Q4_CAPACITY.md) covers alternative partitions and disk requirements. The [observed IQ3_S reference](../bench/distributed/results/2026-11-03-m4-pro/observed-iq3-speed.json) records aggregate rates by context size for 67 normal requests. Use controlled paired trials for any throughput claim.
+
+## First real IQ3_S boundary and RTX arithmetic check
+
+The isolated single-token-prompt run with token ID 9707 matched all 64 control and reference output tokens. Across positions 1–63, the synchronized Metal time for layers 4–9 had a median of 23.40 ms and p95 of 31.79 ms. Position zero took 38.93 ms. The separate TCP replay verified exactly 51,216 bytes each way. These numbers include the two diagnostic synchronization points. The separate Wi-Fi test had a median of 7.20 ms for this payload. The difference of medians (16.20 ms) is a rough budget for remote compute, staging and orchestration, not measured savings. [Capture summary](../bench/distributed/fixtures/iq3_s-t1-p0/summary.json)
+
+The first Windows test runs the upstream CUDA residual update at entry to layer 4 on these captured tensors and compares 10,240 resulting FP32 values with both the Metal gr_norm result and an independent CPU formula. The tiny fixture uses a fixed public test input and includes no weights. This test does not time or run the complete six-layer block. Building requires CMake 3.24+, Visual Studio 2022 with the C++ workload and the CUDA Toolkit with Visual Studio integration. Run from the repository root in PowerShell:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\bench\distributed\cuda\run-pending-write.ps1
+```
+
+The script builds in the temporary directory and prints the GPU name and numerical errors. The complete-block comparison tool is for a future worker that computes its own layer-10 output.

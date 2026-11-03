@@ -1,0 +1,23 @@
+{
+  "reference_tokens_matched": 64,
+  "timing": {
+    "first_position_ms": 38.92925,
+    "later_positions": 63,
+    "later_p50_ms": 23.398583,
+    "later_p95_ms": 31.794042
+  },
+  "replay": {
+    "method": "localhost_fixture_replay",
+    "exact_match": true,
+    "start_layer": 4,
+    "end_layer_exclusive": 10,
+    "rows": 1,
+    "position": 0,
+    "request_bytes": 51216,
+    "response_bytes": 51216,
+    "header_bytes_each_way": 48,
+    "fixture_sha256": "730fed989be82a854f02f930643d68469855969ae4cd9cde1f034323e87983e0",
+    "input_sha256": "c528204a5174b2fc8e583a891a351f8d82b007e644804c9bd027e3c06ee19e14",
+    "output_sha256": "c201b36f41552ab46aec19431d50482dd9d9e3a988e281753bd5eebb9fe7e068"
+  }
+}
