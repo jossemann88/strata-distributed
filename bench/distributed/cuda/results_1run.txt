@@ -1,0 +1,59 @@
+ .\bench\distributed\cuda\run-pending-write.ps1
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26200.
+-- The CXX compiler identification is MSVC 19.44.35229.0
+-- The CUDA compiler identification is NVIDIA 13.4.92 with host compiler MSVC 19.44.35229.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Detecting CUDA compiler ABI info
+-- Detecting CUDA compiler ABI info - done
+-- Check for working CUDA compiler: C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.4/bin/nvcc.exe - skipped
+-- Detecting CUDA compile features
+-- Detecting CUDA compile features - done
+-- Configuring done (12.1s)
+-- Generating done (0.0s)
+-- Build files have been written to: C:/Users/danie/AppData/Local/Temp/strata-distributed-sm89-vs2022
+MSBuild version 17.14.60+43b635718 for .NET Framework
+
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(548
+,5): warning MSB8029: The Intermediate directory or Output directory cannot reside under the Temporary directory as it
+could lead to issues with incremental build. [C:\Users\danie\AppData\Local\Temp\strata-distributed-sm89-vs2022\ZERO_CHE
+CK.vcxproj]
+  1>Checking Build System
+C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(548
+,5): warning MSB8029: The Intermediate directory or Output directory cannot reside under the Temporary directory as it
+could lead to issues with incremental build. [C:\Users\danie\AppData\Local\Temp\strata-distributed-sm89-vs2022\pending_
+write.vcxproj]
+  Building Custom Rule E:/Developer/strata-distributed/bench/distributed/cuda/CMakeLists.txt
+  Compiling CUDA source file E:\Developer\strata-distributed\bench\distributed\cuda\pending_write_cuda.cu...
+
+  C:\Users\danie\AppData\Local\Temp\strata-distributed-sm89-vs2022>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\
+  v13.4\bin\nvcc.exe"  --use-local-env -ccbin "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\
+  MSVC\14.44.35207\bin\HostX64\x64" -x cu   -I"E:\Developer\strata-distributed\include" -I"C:\Program Files\NVIDIA GPU
+  Computing Toolkit\CUDA\v13.4\include"     --keep-dir pending_write\x64\Release  -maxrregcount=0     --machine 64 --co
+  mpile -forward-unknown-to-host-compiler -std=c++17 --generate-code=arch=compute_89,code=[compute_89,sm_89] -Xcompiler
+  ="/EHsc -Ob2"   -D_WINDOWS -DNDEBUG -D"CMAKE_INTDIR=\"Release\"" -D_MBCS -DWIN32 -D_WINDOWS -DNDEBUG -D"CMAKE_INTDIR=
+  \"Release\"" -Xcompiler "/EHsc /W1 /nologo /O2 /FS   /MD " -Xcompiler "/Fdpending_write.dir\Release\vc143.pdb" -o pen
+  ding_write.dir\Release\pending_write_cuda.obj "E:\Developer\strata-distributed\bench\distributed\cuda\pending_write_c
+  uda.cu"
+  pending_write_cuda.cu
+  Compiling CUDA source file E:\Developer\strata-distributed\src\kernels\cuda\native_gr_postops.cu...
+
+  C:\Users\danie\AppData\Local\Temp\strata-distributed-sm89-vs2022>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\
+  v13.4\bin\nvcc.exe"  --use-local-env -ccbin "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\
+  MSVC\14.44.35207\bin\HostX64\x64" -x cu   -I"E:\Developer\strata-distributed\include" -I"C:\Program Files\NVIDIA GPU
+  Computing Toolkit\CUDA\v13.4\include"     --keep-dir pending_write\x64\Release  -maxrregcount=0     --machine 64 --co
+  mpile -forward-unknown-to-host-compiler -std=c++17 --generate-code=arch=compute_89,code=[compute_89,sm_89] -Xcompiler
+  ="/EHsc -Ob2" --use_fast_math   -D_WINDOWS -DNDEBUG -D"CMAKE_INTDIR=\"Release\"" -D_MBCS -DWIN32 -D_WINDOWS -DNDEBUG
+  -D"CMAKE_INTDIR=\"Release\"" -Xcompiler "/EHsc /W1 /nologo /O2 /FS   /MD " -Xcompiler "/Fdpending_write.dir\Release\v
+  c143.pdb" -o pending_write.dir\Release\native_gr_postops.obj "E:\Developer\strata-distributed\src\kernels\cuda\native
+  _gr_postops.cu"
+  native_gr_postops.cu
+  pending_write.cpp
+  pending_write.vcxproj -> C:\Users\danie\AppData\Local\Temp\strata-distributed-sm89-vs2022\Release\pending_write.exe
+device=NVIDIA GeForce RTX 4070 ordinal=0 sm=89
+backend=cuda component=layer04_pending_write rows=1 floats=10240 max_abs_error=1.47103e-08 max_scaled_error=1.15523e-08 scaled_tolerance=2e-06
+metal_max_scaled_error=0
+PASS: layer 4 residual update matched the CPU and Metal references.
