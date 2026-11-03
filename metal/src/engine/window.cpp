@@ -17,6 +17,7 @@
 #include "ref_quant.h"
 #include "arena_budget.h"
 #include "stream.h"
+#include "block_probe.h"
 #include "../../tests/coop_probe.h"
 
 #include "strata/core/layer.hpp"
@@ -354,6 +355,7 @@ private:
     // the encoded window per (T, head, hp_): built once, then only the positions are patched (the host's encode cost)
     struct Cached {
         std::vector<mtl::Dispatch> ds;
+        BlockProbeStops block;                  // opt-in probe: before layers 4 and 10
         std::vector<int> cuts;                  // SSD streaming: the segment ends (one per layer, before its experts)
         std::vector<std::pair<int, int>> qsa;   // (dispatch, kind): 0 QsaArgs n_tok = T, 1 the merge (MAXT), 2 the scores
     };
@@ -368,7 +370,10 @@ private:
     mtl::Buffer predL_, predL2_;     // 48 x MAXT x 512: layer l + 1's (l + 2's) router logits from layer l's FFN input
     int seg_T_ = 0;
     bool stream_arena(std::string& err);
-    double run_ds(Cached& c, bool decode);
+    std::string boundary_dir_;
+    bool time_block_ = false;
+    double run_ds(Cached& c, bool decode, int64_t pos, std::string& err);
+    double run_block_probe(Cached& c, bool decode, int64_t pos, bool capture, std::string& err);
     // prompts on the matrix units (prompt_chunk below)
     struct PromptGemm;
     PromptGemm* pg_ = nullptr;
@@ -561,6 +566,9 @@ bool Window::init(const strata::core::ModelGeometry& g, strata::core::SessionSta
         // the model does not fit: the dense weights are read into memory below, the experts stream from the SSD
         st_ = std::make_unique<ExpertStream>();
         if (!st_->open(f_, err)) return false;
+        if (const char* dir = std::getenv("STRATA_METAL_BOUNDARY_DIR")) boundary_dir_ = dir;
+        const char* timing = std::getenv("STRATA_METAL_BLOCK_TIMING");
+        time_block_ = timing && std::strcmp(timing, "1") == 0;
         const char* profile = std::getenv("STRATA_METAL_LAYER_WAIT");
         if (profile && std::strcmp(profile, "1") == 0) layer_wait_ = std::make_unique<LayerWaitProfile>();
     } else {
@@ -1283,7 +1291,8 @@ bool Window::run(int Tn, const int32_t* tokens, int64_t pos0, bool head, int32_t
         }
         seg_T_ = Tn;
         const double r0 = now_ms();
-        last_gpu_ms_ = 1000.0 * run_ds(c, decode);
+        last_gpu_ms_ = 1000.0 * run_ds(c, decode, pos0, err);
+        if (last_gpu_ms_ < 0) return false;
         {
             static const int kt = std::getenv("STRATA_METAL_KPROF") ? std::atoi(std::getenv("STRATA_METAL_KPROF")) : 0;
             static int seen = 0;
@@ -1345,7 +1354,11 @@ bool Window::run(int Tn, const int32_t* tokens, int64_t pos0, bool head, int32_t
         g4.grid[0] = HC * N / 256; g4.grid[1] = Tn; g4.tg[0] = 256;
         push(ds, g4);
     }
-    for (int l = 1; l < 48; ++l) layer(ds, l, Tn, pos0);
+    for (int l = 1; l < 48; ++l) {
+        if (Tn == 1 && (!boundary_dir_.empty() || time_block_))
+            cw.block.before_layer(l, (int) ds.size(), cur_inj_);
+        layer(ds, l, Tn, pos0);
+    }
     // ---- the final mixer and the head
     gr_read(ds, "output_hc", true, XA_, true, Tn);
     if (head) gemv(ds, T("output.weight"), XA_, lm_, (size_t) n_vocab_, Tn);
@@ -1368,7 +1381,8 @@ bool Window::run(int Tn, const int32_t* tokens, int64_t pos0, bool head, int32_t
     cuts_ = nullptr;
     seg_T_ = Tn;
     const double r0 = now_ms();
-    last_gpu_ms_ = 1000.0 * run_ds(cw, decode);
+    last_gpu_ms_ = 1000.0 * run_ds(cw, decode, pos0, err);
+    if (last_gpu_ms_ < 0) return false;
     tp_rg_ = now_ms() - r0;
     last_n_disp_ = (int) ds.size();
     return rows_ ? finish_rows(Tn, tokens, out, t0) : finish(Tn, tokens, pos0, head, out, t0);
@@ -1423,8 +1437,12 @@ bool Window::finish_rows(int Tn, const int32_t* tokens, int32_t* out, double t0)
     return true;
 }
 
-double Window::run_ds(Cached& c, bool decode) {
+double Window::run_ds(Cached& c, bool decode, int64_t pos, std::string& err) {
     if (!stream_) return cx_->run_graph(c.ds);
+    if (c.block.dispatch[0] && !rows_ && active_ == 0) {
+        const bool capture = !boundary_dir_.empty() && pos == 0;
+        if (capture || (time_block_ && decode)) return run_block_probe(c, decode, pos, capture, err);
+    }
     if (decode && layer_wait_) {
         return cx_->run_graph_seg(c.ds, c.cuts, [](void* u, int s) {
             auto* w = static_cast<Window*>(u);
@@ -1432,6 +1450,44 @@ double Window::run_ds(Cached& c, bool decode) {
         }, this);
     }
     return cx_->run_graph_seg(c.ds, c.cuts, [](void* u, int s) { ((Window*) u)->at_cut(s); }, this);
+}
+
+// The ordinary graph still has its 48 router stops. In the measured graph the GPU also
+// stops before the first operation of layers 4 and 10. Host reads at those two stops
+// see exactly the buffers the next gr_norm will consume, before its in-place update.
+double Window::run_block_probe(Cached& c, bool decode, int64_t pos, bool capture, std::string& err) {
+    static_assert(BlockBoundary::width == N && BlockBoundary::channels == HC);
+    struct Probe {
+        Window& w;
+        Cached& graph;
+        BlockBoundary* boundary;
+        bool decode;
+        double start = 0, end = 0;
+    };
+    auto boundary = capture ? std::make_unique<BlockBoundary[]>(2) : nullptr;
+    Probe probe{*this, c, boundary.get(), decode};
+    const auto cuts = c.block.with_boundaries(c.cuts);
+    const double gpu_s = cx_->run_graph_seg(c.ds, cuts, [](void* u, int stop) {
+        auto& p = *static_cast<Probe*>(u);
+        const int i = BlockProbeStops::boundary_index(stop);
+        if (i < 0) {
+            const int l = BlockProbeStops::router_layer(stop);
+            p.w.at_cut(l, p.decode && p.w.layer_wait_ ? &p.w.layer_wait_->bins[1][l] : nullptr);
+            return;
+        }
+        if (i == 1) p.end = now_ms();
+        if (p.boundary) p.boundary[i].capture(p.w.R_, p.w.bo_, p.w.inj_[p.graph.block.inj_bank[i]]);
+        if (i == 0) p.start = now_ms();
+    }, &probe);
+    if (time_block_ && decode)
+        std::fprintf(stderr, "strata metal block_time: begin=4 end=10 T=1 pos=%lld elapsed_ms=%.6f\n",
+                     (long long) pos, probe.end - probe.start);
+    if (capture) {
+        if (!write_block_boundaries(boundary.get(), boundary_dir_, err)) return -1;
+        std::fprintf(stderr, "strata metal boundary: captured layers 4 and 10 at pos=0 T=1\n");
+        boundary_dir_.clear();
+    }
+    return gpu_s;
 }
 
 namespace {
