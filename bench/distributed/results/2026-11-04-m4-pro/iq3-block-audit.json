@@ -1,0 +1,120 @@
+{
+  "weight_audit": {
+    "source_revision": "39a44ca1",
+    "shard": "Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00001-of-00002.gguf",
+    "method": "On M4 Pro, SHA-256 per layer in expert ID order. FileExpertSource::blob_stable after set_gguf and expert_layout_load compared with independent pread of the gate, up and down slices using the GGUF directory from metal/tools/stream_experts.py.",
+    "matched_all_layers": true,
+    "layers": [
+      {
+        "layer": 4,
+        "experts": 512,
+        "byte_count": 1009254400,
+        "sha256": "f265bfcd89cd6a1c449892decc878c8846e2192a92ee399c2ca24acbcd599637"
+      },
+      {
+        "layer": 5,
+        "experts": 512,
+        "byte_count": 1009254400,
+        "sha256": "2b6b5844120e0f89c136bfec3d25cda0661d919e112c14430f3dd5819774b25a"
+      },
+      {
+        "layer": 6,
+        "experts": 512,
+        "byte_count": 1009254400,
+        "sha256": "05e2b0932c71d6e7dd0c0310a293bcb193cc077f228853923ee9f8a6e711bbb7"
+      },
+      {
+        "layer": 7,
+        "experts": 512,
+        "byte_count": 1114112000,
+        "sha256": "3bf8465a53a99d9a7c468976e44ee11d58ab61c2034bed9cf91776ba051fa46b"
+      },
+      {
+        "layer": 8,
+        "experts": 512,
+        "byte_count": 773324800,
+        "sha256": "dd7f762550796124fed7baeaafd93af21ba5dcb2fc58dfbd5c0e4e4c49e2d94e"
+      },
+      {
+        "layer": 9,
+        "experts": 512,
+        "byte_count": 1009254400,
+        "sha256": "0ec4ecc0b645c2218ff11a8bfcd282a33d34128630ed6ee9ef69270bee1a13bf"
+      }
+    ]
+  },
+  "break_even_screen": {
+    "source": "Nov 3 synchronized Metal capture and separate 51,216-byte Wi-Fi echo measurements",
+    "metal_ms_by_position": {
+      "0": 38.92925,
+      "1": 23.227,
+      "2": 24.302458,
+      "3": 20.610666,
+      "4": 17.568667,
+      "5": 28.056042,
+      "6": 22.516958,
+      "7": 30.83,
+      "8": 20.6495,
+      "9": 23.8575,
+      "10": 25.333458,
+      "11": 16.011875,
+      "12": 13.361125,
+      "13": 22.671542,
+      "14": 17.651459,
+      "15": 26.66775,
+      "16": 30.894541,
+      "17": 21.998834,
+      "18": 26.416375,
+      "19": 26.482291,
+      "20": 24.47925,
+      "21": 33.506334,
+      "22": 27.590125,
+      "23": 17.546542,
+      "24": 14.939542,
+      "25": 12.634042,
+      "26": 26.353292,
+      "27": 28.112042,
+      "28": 23.398583,
+      "29": 19.523458,
+      "30": 24.084083,
+      "31": 15.99625,
+      "32": 31.99475,
+      "33": 22.09025,
+      "34": 23.6595,
+      "35": 23.881291,
+      "36": 13.871458,
+      "37": 14.411833,
+      "38": 18.500042,
+      "39": 23.228292,
+      "40": 25.164208,
+      "41": 19.232458,
+      "42": 17.278542,
+      "43": 16.711458,
+      "44": 28.503041,
+      "45": 25.166625,
+      "46": 31.794042,
+      "47": 20.879959,
+      "48": 24.18525,
+      "49": 22.81725,
+      "50": 15.97775,
+      "51": 34.132292,
+      "52": 24.340542,
+      "53": 31.25825,
+      "54": 29.627875,
+      "55": 23.230292,
+      "56": 17.464042,
+      "57": 23.037375,
+      "58": 23.418542,
+      "59": 17.0815,
+      "60": 28.474084,
+      "61": 23.47825,
+      "62": 24.496375,
+      "63": 21.675292
+    },
+    "wifi_source": "../2026-11-03-m4-pro/wifi-block-51216.json",
+    "method": "Nearest-rank p10 of Metal positions 1-63 minus nearest-rank p90 Wi-Fi echo time. These separate runs are unpaired. This is a stress scenario, not an end-to-end percentile.",
+    "metal_p10_ms": 15.99625,
+    "wifi_p90_ms": 9.252167,
+    "remaining_ms": 6.744083
+  }
+}

@@ -148,3 +148,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\bench\distributed\cuda\run
 The runner receives 51,216 bytes at the entrance to layer 4 and writes the same shape at the entrance to layer 10. The wrapper compares all three components against Metal using the fixed thresholds in [the comparison tool](../bench/distributed/compare_cuda_block.py). The first call includes graph setup. Ten further calls reuse the graph, each with fresh sequence state at position zero. The report separates those samples from the first call and records free VRAM at three points. These timings cover an isolated one-row CUDA stage and its mapped handoff. Steady decode with real token history and end-to-end Wi-Fi throughput require a separate experiment.
 
 For review, share `comparison.json` and `runner.log` from the new result folder. On a build error, share the first compiler or linker error. On an execution error, keep the run directory, including the log.
+
+### Host weight audit and Wi-Fi timing margin, 4 November 2026
+
+On the M4 Pro, the C++ file reader used by the CUDA probe assembled all 3,072 expert blobs from the original IQ3_S shard. For each layer, SHA-256 over those blobs in expert order matched a separate read of gate, up and down slices located using the Metal GGUF directory reader. The comparison covered 5,924,454,400 bytes before upload to the GPU.
+
+The fast end of the earlier local block measurements (p10, positions 1–63) was 16.00 ms. The slower end of the separate Wi-Fi echo measurements (p90) was 9.25 ms. Taken together they leave 6.74 ms for computation and remaining overhead in that scenario. The two runs were unpaired. This margin describes sensitivity to timing variation. [Weight digests and raw local timings](../bench/distributed/results/2026-11-04-m4-pro/iq3-block-audit.json)
