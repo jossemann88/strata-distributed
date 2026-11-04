@@ -124,4 +124,27 @@ The first Windows test runs the upstream CUDA residual update at entry to layer 
 powershell -NoProfile -ExecutionPolicy Bypass -File .\bench\distributed\cuda\run-pending-write.ps1
 ```
 
-The script builds in the temporary directory and prints the GPU name and numerical errors. The complete-block comparison tool is for a future worker that computes its own layer-10 output.
+The script builds in the temporary directory and prints the GPU name and numerical errors.
+
+The [first Windows result](../bench/distributed/cuda/results_1run.txt) reports zero scaled error against Metal on the RTX 4070. The largest absolute difference against the CPU formula was 1.47e-8.
+
+## Offline CUDA test of layers 4–9
+
+From the Windows repository root, build the full probe first. This step needs internet access for the engine's pinned ggml source. It can run before copying the model. The build and dependency cache live under `%LOCALAPPDATA%\StrataDistributed`.
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\bench\distributed\cuda\run-block.ps1 -BuildOnly
+```
+
+Use the original first GGUF shard and the three files from the Mac pack used for the capture. Preserve their names and bytes. On the Mac these are under `~/Documents/Strata/Models/IQ3_S` and `~/Documents/Strata/packs/iq3_s`. The required pack files are `index.txt`, `native_experts.txt` and `dense.bin`. Together with the shard they occupy about 56.36 GB (decimal). The probe reads them locally on Windows and verifies SHA-256 before invoking the engine. Here is an example for a Windows copy under `E:\Strata`:
+
+```powershell
+$pack = 'E:\Strata\packs\iq3_s'
+$shard = 'E:\Strata\Models\IQ3_S\Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00001-of-00002.gguf'
+$out = Join-Path $env:LOCALAPPDATA ("StrataDistributed\results\block-" + (Get-Date -Format yyyyMMdd-HHmmss))
+powershell -NoProfile -ExecutionPolicy Bypass -File .\bench\distributed\cuda\run-block.ps1 -Pack $pack -Shard $shard -Out $out
+```
+
+The runner receives 51,216 bytes at the entrance to layer 4 and writes the same shape at the entrance to layer 10. The wrapper compares all three components against Metal using the fixed thresholds in [the comparison tool](../bench/distributed/compare_cuda_block.py). The first call includes graph setup. Ten further calls reuse the graph, each with fresh sequence state at position zero. The report separates those samples from the first call and records free VRAM at three points. These timings cover an isolated one-row CUDA stage and its mapped handoff. Steady decode with real token history and end-to-end Wi-Fi throughput require a separate experiment.
+
+For review, share `comparison.json` and `runner.log` from the new result folder. On a build error, share the first compiler or linker error. On an execution error, keep the run directory, including the log.
