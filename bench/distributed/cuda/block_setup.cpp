@@ -1,4 +1,5 @@
 #include "block_setup.h"
+#include "ref_quant.h"
 
 #include "strata/core/family_layout.hpp"
 #include "strata/kernels/cpu/expert_layout.hpp"
@@ -41,7 +42,43 @@ bool stage_skip(const std::string& pack, const std::vector<std::string>& shards,
 }
 }
 
+bool BlockSetup::match_metal_hc(std::string& err) {
+    // The captured Metal window quantizes BF16 down, up AND inject matrices.
+    // Reuse its CPU conversion so the weight bytes match across backends.
+    for (int layer = first_layer; layer < end_layer; ++layer) {
+        for (const char* half : {"attn", "ffn"}) {
+            for (const char* projection : {"down", "up", "inject"}) {
+                const std::string name = "blk." + std::to_string(layer) + ".hc_" + half + "_" + projection + ".weight";
+                // weights is owned and mutable here. find exposes a const view for engine readers.
+                auto* weight = const_cast<strata::core::WeightRef*>(weights.find(name));
+                if (!weight || !weight->data || weight->hc_q8 ||
+                    weight->kind != strata::core::WeightKind::Bf16InF32 ||
+                    weight->ne0 % 32 || weight->bytes != (uint64_t) weight->elements * 2) {
+                    err = "expected unconverted BF16 hyper-connection weight: " + name;
+                    return false;
+                }
+                std::vector<uint16_t> raw(weight->elements);
+                if (!checked(cudaMemcpy(raw.data(), weight->data, weight->bytes, cudaMemcpyDeviceToHost),
+                             "read HC weight for Metal conversion", err)) return false;
+                std::vector<float> values(raw.size());
+                for (size_t i = 0; i < raw.size(); ++i) values[i] = ref::bf16_to_f32(raw[i]);
+                std::vector<uint8_t> quantized(raw.size() / 32 * 34);
+                ref::quantize_q8_0(values.data(), values.size(), quantized.data());
+                void* buffer = nullptr;
+                if (!checked(cudaMalloc(&buffer, quantized.size()), "allocate HC Q8 weight", err)) return false;
+                hc_weights_.push_back(buffer);
+                if (!checked(cudaMemcpy(buffer, quantized.data(), quantized.size(), cudaMemcpyHostToDevice),
+                             "upload HC Q8 weight", err)) return false;
+                weight->hc_q8 = buffer;
+            }
+        }
+    }
+    std::printf("hc_weight_mode=metal_q8_down_up_inject\n");
+    return true;
+}
+
 BlockSetup::~BlockSetup() {
+    for (void* buffer : hc_weights_) cudaFree(buffer);
     // qsa_states uses global ordinals even in a trimmed session.
     if (session.qsa_states) {
         for (int64_t j = 0; j < session.qsa_alloc; ++j) {
@@ -94,7 +131,8 @@ bool BlockSetup::init(const std::string& pack, const std::string& gguf, std::str
     if (!stage_skip(pack, shards, skip, err) || !WeightTable::pool_bytes(pack, pool, err, &skip) ||
         !checked(cudaMalloc(&weights_arena_, pool), "allocate canonical weights", err) ||
         !weights.load(pack, weights_arena_, pool, err, &skip) ||
-        !dense_.load(shards, weights, err, false, first_layer, end_layer))
+        !dense_.load(shards, weights, err, false, first_layer, end_layer) ||
+        !match_metal_hc(err))
         return false;
 
     const auto state_bytes = session_bytes(geometry, context, top_k, first_layer, end_layer);

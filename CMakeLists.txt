@@ -694,7 +694,9 @@ if(STRATA_ENABLE_CUDA OR STRATA_ENABLE_HIP)
       message(FATAL_ERROR "The distributed block probe requires CUDA and native experts")
     endif()
     add_executable(strata_block_probe EXCLUDE_FROM_ALL
-      bench/distributed/cuda/block_runner.cpp bench/distributed/cuda/block_setup.cpp)
+      bench/distributed/cuda/block_runner.cpp bench/distributed/cuda/block_setup.cpp
+      metal/src/ref_quant.cpp)
+    target_include_directories(strata_block_probe PRIVATE metal/src third_party/ggml)
     strata_utf8_manifest(strata_block_probe)
     target_link_libraries(strata_block_probe PRIVATE strata_engine)
   endif()

@@ -85,7 +85,7 @@ def run(engine, pack, shard, out):
     build_id = file_digest(engine)
     command = [str(engine), "--pack", str(pack), "--shard", str(shard),
                "--input", str(input_path), "--output", str(output_path)]
-    log = out / "runner.log"
+    log = out / "runner.txt"
     print(f"Running layers 4-9 on CUDA. Log: {log}", flush=True)
     env = {key: value for key, value in os.environ.items() if not key.upper().startswith("STRATA_")}
     with log.open("wb") as transcript:
@@ -95,6 +95,8 @@ def run(engine, pack, shard, out):
     print(transcript, flush=True)
     if completed.returncode:
         raise ValueError(f"CUDA runner exited with {completed.returncode}, see {log}")
+    if transcript.splitlines().count("hc_weight_mode=metal_q8_down_up_inject") != 1:
+        raise ValueError("runner does not confirm the Metal hyper-connection weight conversion; rebuild the probe")
     timing = measurement(transcript)
     if output_path.stat().st_size != STATE_BYTES:
         raise ValueError(f"runner must return exactly {STATE_BYTES} bytes")
@@ -104,6 +106,7 @@ def run(engine, pack, shard, out):
         "build_id": "exe-sha256:" + build_id, "fixture_sha256": identity.hex(),
         "weight_sha256": WEIGHT_SHA256, "input_sha256": sha256(before),
         "output_sha256": file_digest(output_path),
+        "hc_weight_mode": "metal_q8_down_up_inject",
     })
     result = compare(FIXTURE / "boundary", FIXTURE / "summary.json", out)
     result["position_zero_measurement"] = timing

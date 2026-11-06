@@ -21,6 +21,8 @@ struct BlockSetup {
     ~BlockSetup();
 
 private:
+    bool match_metal_hc(std::string& err);
+    std::vector<void*> hc_weights_;
     strata::core::NativeDense dense_;
     strata::core::ExpertCache cache_;
     void* weights_arena_ = nullptr;

@@ -11,7 +11,7 @@ import run_cuda_block as probe
 
 
 def log_lines():
-    return ["cuda_device=test", "p0_first_graph_ms=22", "p0_max_repeat_delta=0",
+    return ["hc_weight_mode=metal_q8_down_up_inject", "cuda_device=test", "p0_first_graph_ms=22", "p0_max_repeat_delta=0",
             "vram_free_bytes_before_setup=180", "vram_free_bytes_after_init=100",
             "vram_free_bytes_after_first_graph=90"] + [f"p0_warm_{n}_ms={n}" for n in range(1, 11)]
 
@@ -32,12 +32,14 @@ class BlockProbeTests(unittest.TestCase):
             stub.write_bytes(b"stub")
             out = root / "result"
 
+            transcript_lines = log_lines()
+
             def fake_run(args, **kwargs):
                 src = Path(args[args.index("--input") + 1])
                 self.assertEqual(src.read_bytes(), before)
                 self.assertNotIn(str(probe.FIXTURE), " ".join(args))
                 Path(args[args.index("--output") + 1]).write_bytes(after)
-                kwargs["stdout"].write("\n".join(log_lines()).encode())
+                kwargs["stdout"].write("\n".join(transcript_lines).encode())
                 return CompletedProcess(args, 0)
 
             digest = probe.file_digest(stub)
@@ -49,6 +51,9 @@ class BlockProbeTests(unittest.TestCase):
                 self.assertTrue(result["within_tolerance"])
                 with self.assertRaisesRegex(ValueError, "new result directory"):
                     probe.run(stub, root, stub, out)
+                transcript_lines.remove("hc_weight_mode=metal_q8_down_up_inject")
+                with self.assertRaisesRegex(ValueError, "rebuild"):
+                    probe.run(stub, root, stub, root / "old-runner")
                 stub.write_bytes(b"oops")
                 with self.assertRaisesRegex(ValueError, "differs"):
                     probe.run(stub, root, stub, root / "bad")
