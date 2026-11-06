@@ -1,0 +1,223 @@
+**********************
+PowerShell transcript start
+Start time: 20261106150931
+Username: WS\danie
+RunAs User: WS\danie
+Configuration Name: 
+Machine: WS (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Program Files\WindowsApps\Microsoft.PowerShell_7.6.9.0_x64__8wekyb3d8bbwe\pwsh.dll
+Process ID: 36272
+PSVersion: 7.6.9
+PSEdition: Core
+GitCommitId: 7.6.9
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+Transcript started, output file is E:\Developer\strata-distributed\bench\distributed\cuda\results\run-20261106-150931-281.txt
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26200.
+-- Strata: verify / batch windows hold up to 8 rows
+-- Strata: CUDA enabled, arch 89
+-- strata: pack/full/experts.bin absent - the expert arena load test is NOT registered
+-- STRATA tests: no python3 with numpy was found (the configured interpreter and .venv were probed) - the iq_parity fixtures and its test are not registered; the fixtures need python3 with numpy and the repository's vendored gguf-py
+-- Warning: ccache not found - consider installing it for faster compilation or disable this warning with GGML_CCACHE=OFF
+-- CMAKE_SYSTEM_PROCESSOR: AMD64
+-- CMAKE_GENERATOR_PLATFORM: x64
+-- GGML_SYSTEM_ARCH: x86
+-- Including CPU backend
+-- x86 detected
+-- Adding CPU backend variant ggml-cpu: /arch:AVX2 GGML_AVX2;GGML_FMA;GGML_F16C
+-- ggml version: 0.24.0
+-- ggml commit:  3cf0325
+-- trellis MMQ (Gyro prompts): overlay on the pinned ggml-cuda in C:/Users/danie/AppData/Local/StrataDistributed/block-sm89-vs2022/ggml-tq-overlay
+-- Configuring done (1.6s)
+-- Generating done (2.1s)
+-- Build files have been written to: C:/Users/danie/AppData/Local/StrataDistributed/block-sm89-vs2022
+MSBuild version 17.14.60+43b635718 for .NET Framework
+
+  1>Checking Build System
+  Building Custom Rule C:/Users/danie/AppData/Local/StrataDistributed/llama-3cf03257f219/ggml/src/CMakeLists.txt
+  Building Custom Rule E:/Developer/strata-distributed/CMakeLists.txt
+  ggml-base.vcxproj -> C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\ggml\src\Release\ggml-base.lib
+  strata_core.vcxproj -> C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\Release\strata_core.lib
+  Building Custom Rule C:/Users/danie/AppData/Local/StrataDistributed/llama-3cf03257f219/ggml/src/CMakeLists.txt
+  Building Custom Rule E:/Developer/strata-distributed/CMakeLists.txt
+  ggml-cpu.vcxproj -> C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\ggml\src\Release\ggml-cpu.lib
+  Building Custom Rule E:/Developer/strata-distributed/CMakeLists.txt
+  strata_kernels_cpu.vcxproj -> C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\Release\strata_kernels_cpu.lib
+  strata_kernels.vcxproj -> C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\Release\strata_kernels.lib
+  Building Custom Rule E:/Developer/strata-distributed/CMakeLists.txt
+  strata_engine.vcxproj -> C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\Release\strata_engine.lib
+  Building Custom Rule E:/Developer/strata-distributed/CMakeLists.txt
+  block_runner.cpp
+E:\Developer\strata-distributed\include\strata\kernels\cpu\expert.hpp(78,29): warning C4324: 'strata::kernels::cpu::ActQ': structure was padded due to alignment specifier [C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\strata_block_probe.vcxproj]
+  (compiling source file 'E:/Developer/strata-distributed/bench/distributed/cuda/block_runner.cpp')
+
+E:\Developer\strata-distributed\include\strata\kernels\cpu\pool.hpp(339,39): warning C4324: 'strata::kernels::cpu::ExpertPool': structure was padded due to alignment specifier [C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\strata_block_probe.vcxproj]
+  (compiling source file 'E:/Developer/strata-distributed/bench/distributed/cuda/block_runner.cpp')
+
+E:\Developer\strata-distributed\include\strata\kernels\cpu\pool.hpp(340,39): warning C4324: 'strata::kernels::cpu::ExpertPool': structure was padded due to alignment specifier [C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\strata_block_probe.vcxproj]
+  (compiling source file 'E:/Developer/strata-distributed/bench/distributed/cuda/block_runner.cpp')
+
+E:\Developer\strata-distributed\include\strata\kernels\cpu\pool.hpp(341,39): warning C4324: 'strata::kernels::cpu::ExpertPool': structure was padded due to alignment specifier [C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\strata_block_probe.vcxproj]
+  (compiling source file 'E:/Developer/strata-distributed/bench/distributed/cuda/block_runner.cpp')
+
+E:\Developer\strata-distributed\include\strata\kernels\cpu\pool.hpp(342,39): warning C4324: 'strata::kernels::cpu::ExpertPool': structure was padded due to alignment specifier [C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\strata_block_probe.vcxproj]
+  (compiling source file 'E:/Developer/strata-distributed/bench/distributed/cuda/block_runner.cpp')
+
+E:\Developer\strata-distributed\include\strata\kernels\cpu\pool.hpp(343,35): warning C4324: 'strata::kernels::cpu::ExpertPool': structure was padded due to alignment specifier [C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\strata_block_probe.vcxproj]
+  (compiling source file 'E:/Developer/strata-distributed/bench/distributed/cuda/block_runner.cpp')
+
+E:\Developer\strata-distributed\include\strata\kernels\cpu\pool.hpp(346,39): warning C4324: 'strata::kernels::cpu::ExpertPool': structure was padded due to alignment specifier [C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\strata_block_probe.vcxproj]
+  (compiling source file 'E:/Developer/strata-distributed/bench/distributed/cuda/block_runner.cpp')
+
+E:\Developer\strata-distributed\include\strata\kernels\cpu\pool.hpp(386,43): warning C4324: 'strata::kernels::cpu::ExpertPool::NodeSync': structure was padded due to alignment specifier [C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\strata_block_probe.vcxproj]
+  (compiling source file 'E:/Developer/strata-distributed/bench/distributed/cuda/block_runner.cpp')
+
+E:\Developer\strata-distributed\include\strata\kernels\cpu\pool.hpp(387,43): warning C4324: 'strata::kernels::cpu::ExpertPool::NodeSync': structure was padded due to alignment specifier [C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\strata_block_probe.vcxproj]
+  (compiling source file 'E:/Developer/strata-distributed/bench/distributed/cuda/block_runner.cpp')
+
+E:\Developer\strata-distributed\include\strata\kernels\cpu\pool.hpp(388,42): warning C4324: 'strata::kernels::cpu::ExpertPool::NodeSync': structure was padded due to alignment specifier [C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\strata_block_probe.vcxproj]
+  (compiling source file 'E:/Developer/strata-distributed/bench/distributed/cuda/block_runner.cpp')
+
+E:\Developer\strata-distributed\include\strata\kernels\cpu\pool.hpp(390,25): warning C4324: 'strata::kernels::cpu::ExpertPool::NodeSync': structure was padded due to alignment specifier [C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\strata_block_probe.vcxproj]
+  (compiling source file 'E:/Developer/strata-distributed/bench/distributed/cuda/block_runner.cpp')
+
+E:\Developer\strata-distributed\bench\distributed\cuda\block_runner.cpp(56,25): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\strata_block_probe.vcxproj]
+  block_setup.cpp
+E:\Developer\strata-distributed\include\strata\kernels\cpu\expert.hpp(78,29): warning C4324: 'strata::kernels::cpu::ActQ': structure was padded due to alignment specifier [C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\strata_block_probe.vcxproj]
+  (compiling source file 'E:/Developer/strata-distributed/bench/distributed/cuda/block_setup.cpp')
+
+E:\Developer\strata-distributed\include\strata\kernels\cpu\pool.hpp(339,39): warning C4324: 'strata::kernels::cpu::ExpertPool': structure was padded due to alignment specifier [C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\strata_block_probe.vcxproj]
+  (compiling source file 'E:/Developer/strata-distributed/bench/distributed/cuda/block_setup.cpp')
+
+E:\Developer\strata-distributed\include\strata\kernels\cpu\pool.hpp(340,39): warning C4324: 'strata::kernels::cpu::ExpertPool': structure was padded due to alignment specifier [C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\strata_block_probe.vcxproj]
+  (compiling source file 'E:/Developer/strata-distributed/bench/distributed/cuda/block_setup.cpp')
+
+E:\Developer\strata-distributed\include\strata\kernels\cpu\pool.hpp(341,39): warning C4324: 'strata::kernels::cpu::ExpertPool': structure was padded due to alignment specifier [C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\strata_block_probe.vcxproj]
+  (compiling source file 'E:/Developer/strata-distributed/bench/distributed/cuda/block_setup.cpp')
+
+E:\Developer\strata-distributed\include\strata\kernels\cpu\pool.hpp(342,39): warning C4324: 'strata::kernels::cpu::ExpertPool': structure was padded due to alignment specifier [C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\strata_block_probe.vcxproj]
+  (compiling source file 'E:/Developer/strata-distributed/bench/distributed/cuda/block_setup.cpp')
+
+E:\Developer\strata-distributed\include\strata\kernels\cpu\pool.hpp(343,35): warning C4324: 'strata::kernels::cpu::ExpertPool': structure was padded due to alignment specifier [C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\strata_block_probe.vcxproj]
+  (compiling source file 'E:/Developer/strata-distributed/bench/distributed/cuda/block_setup.cpp')
+
+E:\Developer\strata-distributed\include\strata\kernels\cpu\pool.hpp(346,39): warning C4324: 'strata::kernels::cpu::ExpertPool': structure was padded due to alignment specifier [C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\strata_block_probe.vcxproj]
+  (compiling source file 'E:/Developer/strata-distributed/bench/distributed/cuda/block_setup.cpp')
+
+E:\Developer\strata-distributed\include\strata\kernels\cpu\pool.hpp(386,43): warning C4324: 'strata::kernels::cpu::ExpertPool::NodeSync': structure was padded due to alignment specifier [C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\strata_block_probe.vcxproj]
+  (compiling source file 'E:/Developer/strata-distributed/bench/distributed/cuda/block_setup.cpp')
+
+E:\Developer\strata-distributed\include\strata\kernels\cpu\pool.hpp(387,43): warning C4324: 'strata::kernels::cpu::ExpertPool::NodeSync': structure was padded due to alignment specifier [C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\strata_block_probe.vcxproj]
+  (compiling source file 'E:/Developer/strata-distributed/bench/distributed/cuda/block_setup.cpp')
+
+E:\Developer\strata-distributed\include\strata\kernels\cpu\pool.hpp(388,42): warning C4324: 'strata::kernels::cpu::ExpertPool::NodeSync': structure was padded due to alignment specifier [C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\strata_block_probe.vcxproj]
+  (compiling source file 'E:/Developer/strata-distributed/bench/distributed/cuda/block_setup.cpp')
+
+E:\Developer\strata-distributed\include\strata\kernels\cpu\pool.hpp(390,25): warning C4324: 'strata::kernels::cpu::ExpertPool::NodeSync': structure was padded due to alignment specifier [C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\strata_block_probe.vcxproj]
+  (compiling source file 'E:/Developer/strata-distributed/bench/distributed/cuda/block_setup.cpp')
+
+E:\Developer\strata-distributed\bench\distributed\cuda\block_setup.cpp(36,18): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details. [C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\strata_block_probe.vcxproj]
+  ref_quant.cpp
+  Generating Code...
+  strata_block_probe.vcxproj -> C:\Users\danie\AppData\Local\StrataDistributed\block-sm89-vs2022\Release\strata_block_probe.exe
+Checking the model shard and pack against the Mac capture...
+Running layers 4-9 on CUDA. Log: C:\Users\danie\AppData\Local\StrataDistributed\results2\block-20261106.150017\runner.txt
+strata hc: CUDA0: the hyper-connection read runs as staged (the norm per token and stream, the down projection's activations staged ahead by cp.async); checked bit for bit against the plain read on this card (STRATA_HC_SPLIT=1 or 0 for the earlier ones)
+strata verify: window up to 2 tokens, 52.0 MiB of device buffers (100% VRAM resident: zero-doorbell graph)
+strata verify: capturing the 1-token window (4680 MiB of VRAM free)
+strata verify: captured the 1-token window (upload no error, sync no error)
+vram_free_bytes_before_setup=11645485056
+hc_weight_mode=metal_q8_down_up_inject
+resident_experts=3072 expert_bytes=5924454400 canonical_bytes=181081472 native_dense_bytes=288069632 session_bytes=185310720
+vram_free_bytes_after_init=4907335680
+p0_first_graph_ms=131.5717
+vram_free_bytes_after_first_graph=4890558464
+p0_warm_1_ms=28.2078
+p0_warm_2_ms=28.1552
+p0_warm_3_ms=27.8308
+p0_warm_4_ms=27.7437
+p0_warm_5_ms=27.8916
+p0_warm_6_ms=27.7344
+p0_warm_7_ms=27.8328
+p0_warm_8_ms=27.8099
+p0_warm_9_ms=12.0426
+p0_warm_10_ms=1.5386
+p0_max_repeat_delta=0
+cuda_device=NVIDIA GeForce RTX 4070
+
+{
+  "schema": "strata.block-comparison.v1",
+  "start_layer": 4,
+  "end_layer_exclusive": 10,
+  "rows": 1,
+  "position": 0,
+  "fixture_sha256": "730fed989be82a854f02f930643d68469855969ae4cd9cde1f034323e87983e0",
+  "cuda_output_sha256": "7c8982a4b4fa917a6cae10b429e22604bb3bb3403e06afb7a84b6875cad2e09c",
+  "cuda_device": "NVIDIA GeForce RTX 4070",
+  "cuda_build_id": "exe-sha256:69564504117262f5d973417d2c7b89a5266c4d5695c71c6d4d714b5172b3dc86",
+  "components": {
+    "residual": {
+      "floats": 10240,
+      "atol": 1e-05,
+      "rtol": 0.001,
+      "outside_tolerance": 7823,
+      "max_abs_error": 0.0047130584716796875,
+      "rms_error": 0.00043134792667518814
+    },
+    "bo": {
+      "floats": 2560,
+      "atol": 1e-05,
+      "rtol": 0.001,
+      "outside_tolerance": 2279,
+      "max_abs_error": 0.0003667948767542839,
+      "rms_error": 0.00010423483307723544
+    },
+    "inj": {
+      "floats": 4,
+      "atol": 1e-06,
+      "rtol": 0.0001,
+      "outside_tolerance": 4,
+      "max_abs_error": 0.03384971618652344,
+      "rms_error": 0.01867898661291725
+    }
+  },
+  "within_tolerance": false,
+  "position_zero_measurement": {
+    "device": "NVIDIA GeForce RTX 4070",
+    "first_graph_ms": 131.5717,
+    "warm_p0_samples_ms": [
+      28.2078,
+      28.1552,
+      27.8308,
+      27.7437,
+      27.8916,
+      27.7344,
+      27.8328,
+      27.8099,
+      12.0426,
+      1.5386
+    ],
+    "warm_p0_median_ms": 27.820349999999998,
+    "max_repeat_delta": 0.0,
+    "vram_free_bytes": {
+      "before_setup": 11645485056,
+      "after_init": 4907335680,
+      "after_first_graph": 4890558464
+    }
+  }
+}
+Exception: E:\Developer\strata-distributed\bench\distributed\cuda\run-block.ps1:60
+Line |
+  60 |  … DE -ne 0) { throw "CUDA block test failed. See the diagnostic above." …
+     |                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | CUDA block test failed. See the diagnostic above.
+FAILED. Upload this log: E:\Developer\strata-distributed\bench\distributed\cuda\results\run-20261106-150931-281.txt
+**********************
+PowerShell transcript end
+End time: 20261106151032
+**********************
