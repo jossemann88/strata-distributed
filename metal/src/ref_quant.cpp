@@ -3,6 +3,10 @@
 // 32-blocks from Strata's include/strata/artifact/dequant.hpp (themselves transcribed from the same commit).
 #include "ref_quant.h"
 
+#if defined(STRATA_REF_GGML_FP16)
+#include "ggml.h"
+#endif
+
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
@@ -75,10 +79,14 @@ float f16_to_f32(uint16_t h) {
 }
 
 uint16_t f32_to_f16(float f) {
+#if defined(STRATA_REF_GGML_FP16)
+    return ggml_fp32_to_fp16(f);
+#else
     _Float16 h = (_Float16)f;
     uint16_t r;
     std::memcpy(&r, &h, 2);
     return r;
+#endif
 }
 
 float bf16_to_f32(uint16_t h) {
