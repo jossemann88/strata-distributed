@@ -163,3 +163,5 @@ The uploaded RTX 4070 run completed with repeat delta zero, but failed the fixed
 The probe setup omitted Metal's default Q8_0 conversion of BF16 hyper-connection down, up and injection matrices. The original CUDA setup used BF16 for these matrices. The probe now converts all 36 matrices across layers 4–9 with the same CPU conversion used by the Metal capture, then provides these bytes to the existing CUDA kernels. The thresholds remain fixed. Numerical agreement still requires a new RTX run.
 
 The wrapper requires the new executable's conversion marker and records that mode in the manifest. It saves the transcript as `runner.txt` so the repository's general `*.log` ignore rule allows the diagnostic transcript to be uploaded.
+
+The PowerShell launcher also saves a complete transcript to `bench/distributed/cuda/results/run-<timestamp>.txt` from before setup and path checks. This includes compiler output and errors that occur before `runner.txt` can be created. Upload that transcript when a run stops early. A fresh PowerShell window requires the pack and shard variables to be set again.
