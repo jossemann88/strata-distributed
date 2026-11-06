@@ -30,7 +30,7 @@ try {
         if (-not (Test-Path -LiteralPath $Shard -PathType Leaf)) { throw "First GGUF shard not found: $Shard" }
         if (Test-Path -LiteralPath $Out) { throw "Choose a new output directory: $Out" }
     }
-    
+
     # Fetch just the commit named by Strata, avoiding a full clone of llama.cpp's history.
     $pin = ((Get-Content -LiteralPath (Join-Path $repo "third_party/ggml/VERSION.txt") -TotalCount 1) -split " ")[0]
     if ($pin -notmatch "^[0-9a-f]{40}$") { throw "Invalid pinned llama.cpp revision" }
@@ -55,7 +55,7 @@ try {
     $engine = Join-Path $build "Release/strata_block_probe.exe"
     if (-not (Test-Path -LiteralPath $engine -PathType Leaf)) { throw "Missing probe executable: $engine" }
     if ($BuildOnly) { Write-Output "Built $engine"; return }
-    
+
     py -3 (Join-Path $PSScriptRoot "../run_cuda_block.py") --engine $engine --pack $Pack --shard $Shard --out $Out | Out-Host
     if ($LASTEXITCODE -ne 0) { throw "CUDA block test failed. See the diagnostic above." }
 }
