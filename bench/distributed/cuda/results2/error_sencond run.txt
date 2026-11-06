@@ -1,0 +1,15 @@
+E:\Developer\strata-distributed\metal\src\ref_quant.cpp(78,5): error C2065: '_Float16': undeclared identifier [C:\Users\danie\AppData\Local\StrataDistributed\b
+lock-sm89-vs2022\strata_block_probe.vcxproj]
+E:\Developer\strata-distributed\metal\src\ref_quant.cpp(78,14): error C2146: syntax error: missing ';' before identifier 'h' [C:\Users\danie\AppData\Local\Stra
+taDistributed\block-sm89-vs2022\strata_block_probe.vcxproj]
+E:\Developer\strata-distributed\metal\src\ref_quant.cpp(78,14): error C2065: 'h': undeclared identifier [C:\Users\danie\AppData\Local\StrataDistributed\block-s
+m89-vs2022\strata_block_probe.vcxproj]
+E:\Developer\strata-distributed\metal\src\ref_quant.cpp(78,19): error C2065: '_Float16': undeclared identifier [C:\Users\danie\AppData\Local\StrataDistributed\
+block-sm89-vs2022\strata_block_probe.vcxproj]
+E:\Developer\strata-distributed\metal\src\ref_quant.cpp(78,28): error C2146: syntax error: missing ';' before identifier 'f' [C:\Users\danie\AppData\Local\Stra
+taDistributed\block-sm89-vs2022\strata_block_probe.vcxproj]
+E:\Developer\strata-distributed\metal\src\ref_quant.cpp(80,22): error C2065: 'h': undeclared identifier [C:\Users\danie\AppData\Local\StrataDistributed\block-s
+m89-vs2022\strata_block_probe.vcxproj]
+Exception: E:\Developer\strata-distributed\bench\distributed\cuda\run-block.ps1:45
+Line |
+  45 |  … LASTEXITCODE -ne 0) { throw "The CUDA block probe failed to build." }
