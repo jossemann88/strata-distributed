@@ -1,0 +1,16 @@
+{
+  "start_layer": 4,
+  "end_layer_exclusive": 10,
+  "rows": 1,
+  "position": 0,
+  "schema": "strata.cuda-block-output.v1",
+  "backend": "cuda",
+  "operation": "compute_full_block",
+  "dtype": "f32le",
+  "device": "NVIDIA GeForce RTX 4070",
+  "build_id": "exe-sha256:b887bb588a74ae0de8a66879a75602a42c4e0832404158e6adc66d98fd6ab118",
+  "fixture_sha256": "730fed989be82a854f02f930643d68469855969ae4cd9cde1f034323e87983e0",
+  "weight_sha256": "4c1eb2ceb4915e1192f4f386021897bde56a97f40a0bb78bb86465e0f7d2aca3",
+  "input_sha256": "c528204a5174b2fc8e583a891a351f8d82b007e644804c9bd027e3c06ee19e14",
+  "output_sha256": "a92f41b8a0b822f89eefff8d4e7c7a60a9742399e0ca450bfc2bca1f4ebe050a"
+}

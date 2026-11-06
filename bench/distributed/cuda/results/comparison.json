@@ -1,0 +1,61 @@
+{
+  "schema": "strata.block-comparison.v1",
+  "start_layer": 4,
+  "end_layer_exclusive": 10,
+  "rows": 1,
+  "position": 0,
+  "fixture_sha256": "730fed989be82a854f02f930643d68469855969ae4cd9cde1f034323e87983e0",
+  "cuda_output_sha256": "a92f41b8a0b822f89eefff8d4e7c7a60a9742399e0ca450bfc2bca1f4ebe050a",
+  "cuda_device": "NVIDIA GeForce RTX 4070",
+  "cuda_build_id": "exe-sha256:b887bb588a74ae0de8a66879a75602a42c4e0832404158e6adc66d98fd6ab118",
+  "components": {
+    "residual": {
+      "floats": 10240,
+      "atol": 1e-05,
+      "rtol": 0.001,
+      "outside_tolerance": 8094,
+      "max_abs_error": 0.015228033065795898,
+      "rms_error": 0.0005057810038680721
+    },
+    "bo": {
+      "floats": 2560,
+      "atol": 1e-05,
+      "rtol": 0.001,
+      "outside_tolerance": 2354,
+      "max_abs_error": 0.0007584665436297655,
+      "rms_error": 0.00013550412111563328
+    },
+    "inj": {
+      "floats": 4,
+      "atol": 1e-06,
+      "rtol": 0.0001,
+      "outside_tolerance": 4,
+      "max_abs_error": 0.060028076171875,
+      "rms_error": 0.03118400649101211
+    }
+  },
+  "within_tolerance": false,
+  "position_zero_measurement": {
+    "device": "NVIDIA GeForce RTX 4070",
+    "first_graph_ms": 141.6477,
+    "warm_p0_samples_ms": [
+      31.45,
+      31.7615,
+      31.1711,
+      32.0203,
+      31.4533,
+      1.6814,
+      1.6735,
+      1.6564,
+      1.6782,
+      1.6855
+    ],
+    "warm_p0_median_ms": 16.4283,
+    "max_repeat_delta": 0.0,
+    "vram_free_bytes": {
+      "before_setup": 11645485056,
+      "after_init": 5007998976,
+      "after_first_graph": 4991221760
+    }
+  }
+}
